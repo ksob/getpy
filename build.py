@@ -9,6 +9,8 @@ basic_types = [
     'str16',
     'str32',
 
+    'bool',
+
     'uint8',
     'uint16',
     'uint32',
@@ -30,6 +32,7 @@ basic_cpp_types = {
     'str16' : 'std::array<char, 16>',
     'str32' : 'std::array<char, 32>',
 
+    'bool' : 'bool',
     'int8' : 'int8_t',
     'int16' : 'int16_t',
     'int32' : 'int32_t',
@@ -50,6 +53,8 @@ basic_np_types = {
     'str8' : 'U8',
     'str16' : 'U16',
     'str32' : 'U32',
+
+    'bool' : 'bool',
 
     'int8' : 'i1',
     'int16' : 'i2',
