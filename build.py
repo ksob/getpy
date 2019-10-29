@@ -68,46 +68,17 @@ basic_np_types = {
     'float64' : 'f8',
 }
 
+# Restricted list of keys and values to have a fast compilation
 
-key_types = [
-    'str4',
-    'str8',
+key_types = ['uint64']
 
-    'uint32',
-    'uint64',
+set_key_types = []
 
-    'int32',
-    'int64',
-]
+value_types = ['uint8']
 
-
-set_key_types = [
-    'str4',
-    'str8',
-
-    'uint32',
-    'uint64',
-
-    'int32',
-    'int64',
-
-    *[f'bytearray{i}' for i in bytearray_lengths],
-
-    *[f'byte8array{i}' for i in byte8array_lengths],
-]
-
-
-value_types = [
-    *[basic_type for basic_type in basic_types],
-
-    *[f'bytearray{i}' for i in bytearray_lengths],
-
-    *[f'byte8array{i}' for i in byte8array_lengths],
-]
-
-
-assert all([type_ in value_types for type_ in key_types + set_key_types])
-
+assert all([type_ in key_types for type_ in set_key_types])
+assert all([type_ in basic_np_types for type_ in key_types])
+assert all([type_ in basic_cpp_types for type_ in key_types])
 
 cpp_types = {
     **{basic_type : basic_cpp_types[basic_type] for basic_type in basic_types},
@@ -194,8 +165,8 @@ def write_getpy_cpp(key_types, value_types):
 #include <pybind11/pybind11.h>
 
 """)
-
-        for type_ in value_types:
+        all_types = value_types + [k for k in key_types if k not in value_types]
+        for type_ in all_types:
             if type_ in generic_types:
                 write_generic_types(getpy_file, type_)
             else:
@@ -208,7 +179,7 @@ PYBIND11_MODULE(_getpy, m) {
 
 """)
 
-        for type_ in value_types:
+        for type_ in all_types:
             if type_ in generic_types:
                 write_numpy_dtype(getpy_file, type_)
             else:
@@ -238,9 +209,9 @@ import _getpy as _gp
 
 types = {
 """)
-
-        for value_type in value_types:
-            write_types_dict(getpy_file, value_type)
+        all_types = value_types + [k for k in key_types if k not in value_types]
+        for _type in all_types:
+            write_types_dict(getpy_file, _type)
 
         getpy_file.write("""\
 }
